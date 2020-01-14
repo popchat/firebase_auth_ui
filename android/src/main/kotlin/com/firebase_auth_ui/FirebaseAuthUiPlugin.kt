@@ -111,7 +111,7 @@ class FirebaseAuthUiPlugin(private val activity: Activity) : MethodCallHandler, 
         val providers = mutableListOf<AuthUI.IdpConfig>()
         authProviders?.forEach {
             when (it) {
-                "password" -> providers.add(AuthUI.IdpConfig.EmailBuilder().build())
+                "password" -> providers.add(AuthUI.IdpConfig.EmailBuilder().setRequireName(false).build())
                 "google" -> providers.add(AuthUI.IdpConfig.GoogleBuilder()
                         .build())
                 "facebook" -> providers.add(AuthUI.IdpConfig.FacebookBuilder()

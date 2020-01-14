@@ -65,6 +65,11 @@ public class SwiftFirebaseAuthUiPlugin: NSObject, FlutterPlugin, FUIAuthDelegate
                         authUI?.privacyPolicyURL = URL(string: privacyPolicy)!
                     }
 
+                    if #available(iOS 13, *) {
+                      authUI?.isInteractiveDismissEnabled = false
+                    }
+                    authUI?.shouldHideCancelButton = true
+                    
                     let authViewController = authUI!.authViewController()
                     self.result = result
                     launchFlow(authViewController: authViewController)
@@ -103,6 +108,7 @@ public class SwiftFirebaseAuthUiPlugin: NSObject, FlutterPlugin, FUIAuthDelegate
 
         private func launchFlow(authViewController: UIViewController) {
             let viewController = UIApplication.shared.delegate!.window!!.rootViewController!
+            authViewController.modalPresentationStyle = .fullScreen
             viewController.present(authViewController, animated: true)
         }
 
@@ -110,8 +116,9 @@ public class SwiftFirebaseAuthUiPlugin: NSObject, FlutterPlugin, FUIAuthDelegate
             var authProviders = Array<FUIAuthProvider>()
             if (!providers.isEmpty) {
                 providers.forEach { provider in
-                    if (provider == "password") {
-                        authProviders.append(FUIEmailAuth())
+                    if provider == "password", let authUI = FUIAuth.defaultAuthUI() {
+                      authProviders.append(FUIEmailAuth(authAuthUI: authUI, signInMethod: EmailPasswordAuthSignInMethod, forceSameDevice: false, allowNewEmailAccounts: true,
+                            requireDisplayName: false, actionCodeSetting: ActionCodeSettings()))
                     } else if (provider == "google") {
                         authProviders.append(FUIGoogleAuth())
                     } else if (provider == "facebook") {
